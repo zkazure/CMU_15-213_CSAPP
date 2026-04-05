@@ -2,7 +2,8 @@
 # Makefile that builds btest and other helper programs for the CS:APP data lab
 #
 CC = gcc
-CFLAGS = -O1 -Wall -m32
+# -Wno-bool-operation: GCC warns on ~(!!x); Data Lab code intentionally uses ~ on 0/1.
+CFLAGS = -O1 -Wall -m32 -Wno-bool-operation -Wno-maybe-uninitialized
 LIBS = -lm
 
 all: btest fshow ishow
