@@ -221,7 +221,12 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    int sign = !((x ^ y) >> 31); // 0 为异号
+    int a = !(y >> 31); // y 为负数则 false
+    int b = !!((x + ~y + 1) >> 31) | !(x ^ y); // x-y <= 0 则为 true
+    int ma = (~!sign) + 1;
+    int mb = (~!!sign) + 1;
+    return (mb & b) | (ma & a);
 }
 //4
 /*
