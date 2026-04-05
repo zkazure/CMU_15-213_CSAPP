@@ -289,7 +289,32 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return 2;
+    int sign, expo, frac;
+
+    sign = (uf >> 31) & 1;
+    expo = (uf >> 23) & 255;
+    frac = uf & 0x7FFFFF;
+
+    if (expo == 255) {
+        if (frac != 0)
+            return uf;
+        else
+            return sign << 31 | 0xFF << 23;
+    }
+
+    if (expo == 0) {
+        if (frac == 0)
+            return uf;
+        else {
+            frac = frac << 1;
+            return (sign << 31) | frac;
+        }
+    }
+
+
+    expo += 1;
+    if (expo == 255) frac = 0;
+    return (sign << 31) | (expo << 23) | frac;
 }
 /*
  * float_i2f - Return bit-level equivalent of expression (float) x
