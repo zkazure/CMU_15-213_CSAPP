@@ -1,0 +1,5 @@
+#+title: README
+
+- [[https://csdiy.wiki/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E5%9F%BA%E7%A1%80/CSAPP/][csdiy]]
+- [[https://csapp.cs.cmu.edu/][official website]]
+- [[https://www.bilibili.com/video/BV1iW411d7hd/?vd_source=c929e07d3af3e6861de93427e4190229][videos]]
