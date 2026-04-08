@@ -346,7 +346,7 @@ unsigned float_i2f(int x) {
         x = x << (31 - i);
         fraction_mask = (1 << 23) - 1; // 0x7FFFFF
         fraction = fraction_mask & (x >> 8);
-        // if the lowest 8 bits is larger than one, delta to be 1
+        // if the lowest 8 bits is larger than half, delta to be 1
         x = x & 0xFF;
         delta = x > 128 || ((x == 128) && (fraction & 1));
         fraction += delta;
@@ -372,5 +372,27 @@ unsigned float_i2f(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+    int sign, exponent, fraction;
+    int bias;
+
+    sign = (uf >> 31) & 1;
+    exponent = (uf >> 23) & 0xff;
+    fraction = uf & ((1 << 23) - 1);
+    bias = exponent - 127;
+
+    if (!exponent || bias < 0)
+        return 0;
+    else if (exponent == 255 || bias > 30) {
+        return 1 << 31;
+    }
+
+    fraction = (1 << 23) | fraction;
+    if (bias > 23)
+        fraction <<= (bias - 23);
+    else
+        fraction >>= (23 - bias);
+    if (sign)
+        fraction = ~fraction + 1;
+
+    return fraction;
 }
