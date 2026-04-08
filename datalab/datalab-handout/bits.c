@@ -326,7 +326,38 @@ unsigned float_twice(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+    int sign, exponent, fraction;
+    int i, fraction_mask, delta;
+
+    sign = x >> 31 & 1;
+
+    if (x == 0)
+        return x;
+    else if (x == 0x80000000)
+        exponent = 158, fraction = 0;
+    else {
+        if (sign)
+            x = -x;
+        i = 30;
+        while(!(x >> i)) {
+            i--;
+        }
+        exponent = i + 127;
+        x = x << (31 - i);
+        fraction_mask = (1 << 23) - 1; // 0x7FFFFF
+        fraction = fraction_mask & (x >> 8);
+        // if the lowest 8 bits is larger than one, delta to be 1
+        x = x & 0xFF;
+        delta = x > 128 || ((x == 128) && (fraction & 1));
+        fraction += delta;
+        // if after rounding, ...
+        if (fraction >> 23) {
+            fraction &= fraction_mask;
+            exponent += 1;
+        }
+    }
+
+    return (sign << 31) | (exponent << 23) | fraction;
 }
 /*
  * float_f2i - Return bit-level equivalent of expression (int) f
