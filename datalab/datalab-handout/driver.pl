@@ -18,6 +18,10 @@ use lib ".";
 # Set to 1 to use btest, 0 to use the BDD checker.
 my $USE_BTEST = 0; 
 
+# Newer gcc -E injects stdc-predef.h into the middle of preprocessed output,
+# which breaks dlc -z (e.g. bitXor). Use freestanding preprocess to avoid that.
+my $DLC_PREPROC = "-P'gcc -E -x c -ffreestanding'";
+
 # Generic settings 
 $| = 1;      # Flush stdout each time
 umask(0077); # Files created by the user in tmp readable only by that user
@@ -167,7 +171,7 @@ unless (chdir($tmpdir)) {
 print "1. Running './dlc -z' to identify coding rules violations.\n";
 system("cp bits.c save-bits.c") == 0
     or die "$0: ERROR: Could not create backup copy of bits.c. $diemsg\n";
-system("./dlc -z -o zap-bits.c bits.c") == 0
+system("./dlc $DLC_PREPROC -z -o zap-bits.c bits.c") == 0
     or die "$0: ERROR: zapped bits.c did not compile. $diemsg\n";
 
 #
@@ -200,7 +204,7 @@ else {
 # Run dlc to identify operator count violations.
 # 
 print "\n3. Running './dlc -Z' to identify operator count violations.\n";
-system("./dlc -Z -o Zap-bits.c save-bits.c") == 0
+system("./dlc $DLC_PREPROC -Z -o Zap-bits.c save-bits.c") == 0
     or die "$0: ERROR: dlc unable to generated Zapped bits.c file.\n";
 
 #
@@ -234,7 +238,7 @@ else {
 # Run dlc to get the operator counts on the zapped input file
 #
 print "\n5. Running './dlc -e' to get operator count of each function.\n";
-$status = system("./dlc -W1 -e zap-bits.c > dlc-opcount.out 2>&1");
+$status = system("./dlc $DLC_PREPROC -W1 -e zap-bits.c > dlc-opcount.out 2>&1");
 if ($status != 0) {
     die "$0: ERROR: bits.c did not compile. $diemsg\n";
 }
